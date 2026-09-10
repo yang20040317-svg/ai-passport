@@ -6,6 +6,8 @@
 
 ## Unreleased
 
+- Added a wooden-fish (muyu) tapping demo `main/demo_muyu.c`: OK/DOWN short press strikes (synthesized "dong" tone, the block sinks and springs back, merit +1) and UP short press resets. The counter lives in `main/muyu_merit.c`, which is decoupled from ESP-IDF/LVGL and covered by `tests/test_muyu_merit.c` (day rollover and overflow clamping included). The menu gained a `Muyu` entry, marked `[FAIL]` when buttons or audio are unavailable.
+
 - Added the supplied 80-byte CW2017 profile for the specified 520 mAh cell, including content/update-flag checks, verified writes, the required restart sequence, and bounded SOC-readiness polling.
 
 - Expanded the environment bootstrap document: added Espressif's Git service mirror (`git.espressif.com.cn`) as the preferred mainland-China route for ESP-IDF v5.5.3 and its submodules, documented submodule long-wait/timeout handling, in-place repair, and the pinned-commit shallow fetch for large submodules such as `esp32-wifi-lib`, warned about stale per-repository Jihulab `insteadOf` residue, and added the official offline release archive as a last-resort fallback (learned from `esp-mosaico/esp-mosaico-vibe`).

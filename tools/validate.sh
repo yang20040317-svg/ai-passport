@@ -28,6 +28,10 @@ run_static_checks() {
         tests/test_ui_pixel_math.c main/ui_pixel_math.c \
         -o "${test_dir}/test_ui_pixel_math"
     "${test_dir}/test_ui_pixel_math"
+    "${CC:-cc}" -std=c11 -Wall -Wextra -Werror -Imain \
+        tests/test_muyu_merit.c main/muyu_merit.c \
+        -o "${test_dir}/test_muyu_merit"
+    "${test_dir}/test_muyu_merit"
     python3 tests/test_verify_firmware.py
     rm -rf "${test_dir}"
     echo "Host tests: PASS"
