@@ -5,5 +5,7 @@ managed_components/
 .vscode/
 .idea/
 
-# 凭据(SSID/密码/inbox token)通过 -DMUYU_* 构建参数注入,不入代码。
-# 若你本地需要一个临时版,建议用 main/muyu_creds.local.h 这种带 .local 后缀的名字。
+# 凭据(SSID/密码/inbox token)不进仓库。
+# main/muyu_creds_local.h 由 tools/validate.sh 在构建时从 MUYU_* 环境变量生成,
+# 构建结束即删除;本地手工创建同名文件同样被忽略。
+main/muyu_creds_local.h
