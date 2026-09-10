@@ -135,7 +135,7 @@ static void tick(lv_timer_t *t)
         if (pending > 0) {
             lv_label_set_text_fmt(s_net, "%s%lu", g, (unsigned long)pending);
         } else {
-            lv_label_set_text(g);
+            lv_label_set_text(s_net, g);
         }
     }
 }
