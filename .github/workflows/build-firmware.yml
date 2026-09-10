@@ -44,6 +44,9 @@ jobs:
           extra_docker_args: >-
             -e CCACHE_DIR=/app/${{ github.repository }}/.ccache
             -e IDF_CCACHE_ENABLE=1
+            -e MUYU_INBOX_TOKEN
+            -e MUYU_WIFI_SSID
+            -e MUYU_WIFI_PASS
           command: ./tools/validate.sh --firmware
 
       - name: Set artifact name

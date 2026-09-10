@@ -3,9 +3,9 @@
 // 这些值是个人隐私(SSID/密码 + inbox userToken),不进公开仓库。
 // 本文件已被 .gitignore 忽略,提交时只放这个 .h 模板,真值由构建时 -D 注入:
 //
-//   idf.py build \
-//     -DMUYU_INBOX_TOKEN="<your-token>" \
-//     -DMUYU_WIFI_SSID="<your-ssid>" \
+//   idf.py build
+//     -DMUYU_INBOX_TOKEN="<your-token>"
+//     -DMUYU_WIFI_SSID="<your-ssid>"
 //     -DMUYU_WIFI_PASS="<your-pass>"
 //
 // CI: .github/workflows/build-firmware.yml 会从 repo secrets 读这三个 key
