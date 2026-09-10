@@ -32,6 +32,12 @@ jobs:
 
       - name: Build firmware (ESP-IDF 5.5.3 / esp32c3)
         uses: espressif/esp-idf-ci-action@9d38657f3d789ca759b2b37aaf5ceffbc42c4f0d # v1
+        env:
+          # Muyu inbox 推送需要这三个 secret;若缺,Muyu 页面会编不过(可接受 —— 仓库照常能出固件)。
+          # 设为空字符串则让 build 用 error 退出,提醒用户去设 secret。
+          MUYU_INBOX_TOKEN: ${{ secrets.MUYU_INBOX_TOKEN }}
+          MUYU_WIFI_SSID:   ${{ secrets.MUYU_WIFI_SSID }}
+          MUYU_WIFI_PASS:   ${{ secrets.MUYU_WIFI_PASS }}
         with:
           esp_idf_version: v5.5.3
           target: esp32c3

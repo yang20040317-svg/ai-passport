@@ -15,6 +15,7 @@
 #include "lvgl.h"
 #include "esp_log.h"
 #include "esp_sleep.h"
+#include "muyu_inbox.h"    // 启动 inbox 后台 task(很早就起,让 WiFi 有时间连)
 
 static const char *TAG = "main";
 
@@ -133,6 +134,10 @@ void app_main(void) {
     s_ok[5] = true;
     s_ok[6] = true;
     s_ok[7] = s_ok[1] && s_ok[2];    // Muyu 需要按键(敲)与音频(咚);缺任一则标 [FAIL]
+
+    // 启动 inbox 后台 task(顺带触发 WiFi 启动)。
+    // 这与 Muyu 页面是否可进入无关 —— 队列一直在跑,只是没人调 record_strike。
+    muyu_inbox_start();
 
     if (bsp_lvgl_lock(1000)) { enter_menu(); bsp_lvgl_unlock(); }
 

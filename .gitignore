@@ -4,3 +4,6 @@ sdkconfig.old
 managed_components/
 .vscode/
 .idea/
+
+# 凭据(SSID/密码/inbox token)通过 -DMUYU_* 构建参数注入,不入代码。
+# 若你本地需要一个临时版,建议用 main/muyu_creds.local.h 这种带 .local 后缀的名字。

@@ -8,6 +8,8 @@
 
 - 新增敲木鱼演示页 `main/demo_muyu.c`：OK/DOWN 短按敲击（合成木鱼「咚」声、木鱼下沉回弹、功德 +1），UP 短按清零；计数逻辑抽到与 ESP-IDF/LVGL 解耦的 `main/muyu_merit.c`，并由 `tests/test_muyu_merit.c` 覆盖（含跨日归零与溢出保护）。菜单新增 `Muyu` 项，按键或音频不可用时标 `[FAIL]`。
 
+- Muyu：每次敲击同步 POST 一条 `Merit +N` 到用户私人 inbox（`api.gudong.site/inbox/{token}`）。Wi-Fi STA 连接（`main/muyu_wifi.c`）与 HTTPS POST 客户端（`main/muyu_inbox.c`）在独立 FreeRTOS task 中跑；敲击每 ~2s 批处理成一条，断网时进入 pending，恢复后自动补发，避免连敲撞 100/日 限额。Token 与 Wi-Fi 凭据通过 `-D` 编译参数注入（见 `main/muyu_creds.h`），不进公开仓库、不进 CI 日志。新增 host 测试 `tests/test_muyu_inbox.c` 覆盖 JSON 拼装（单次/批/大数/缓冲区不足）。`build-firmware.yml` 从 repo secrets 读 `MUYU_INBOX_TOKEN` / `MUYU_WIFI_SSID` / `MUYU_WIFI_PASS`；本地构建以同名环境变量传给 `tools/validate.sh --firmware`。
+
 - 加入厂家为优特利 520mAh 电芯生成的 80 字节 CW2017 profile，并实现内容与更新标志检查、写入后校验、规定的重启时序以及有上限的 SOC 就绪等待。
 
 - 扩充环境引导文档：新增乐鑫 Git 服务镜像（`git.espressif.com.cn`）作为中国大陆首选线路，覆盖 ESP-IDF v5.5.3 及其子模块；补充子模块长等待/超时处理、原地修复，以及 `esp32-wifi-lib` 等大仓的按钉死 commit 浅取；提示按仓库残留的 Jihulab `insteadOf` 旧配置；并把官方离线 release 压缩包加入兜底方案（经验来自 `esp-mosaico/esp-mosaico-vibe`）。

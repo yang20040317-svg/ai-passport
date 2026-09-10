@@ -7,6 +7,7 @@
 //    图元现场绘制,不引入二进制图片素材 —— C3 无 PSRAM,能省则省。
 #include "demo.h"
 #include "muyu_merit.h"
+#include "muyu_inbox.h"   // 每次 tap 累计敲击到后台 task,推到个人 inbox
 #include "bsp_audio.h"
 #include "bsp_battery.h"
 #include "bsp_display.h"   // bsp_lvgl_lock / bsp_lvgl_unlock
@@ -34,7 +35,7 @@
 // 不用 math.h 的 M_PI:-std=c11 会定义 __STRICT_ANSI__,部分工具链下 M_PI 不可见。
 #define MUYU_PI         3.14159265f
 
-static lv_obj_t   *s_scr, *s_body, *s_total, *s_sub, *s_bat, *s_mascot;
+static lv_obj_t   *s_scr, *s_body, *s_total, *s_sub, *s_bat, *s_mascot, *s_net;
 static lv_timer_t *s_timer;
 static TaskHandle_t s_task;
 static volatile int  s_req;          // 1 = 敲一下
@@ -125,6 +126,18 @@ static void tick(lv_timer_t *t)
     }
     int soc = bsp_battery_soc();          // -1 = 不可用,保持上次文本不动
     if (soc >= 0 && s_bat) lv_label_set_text_fmt(s_bat, "%d%%", soc);
+
+    // inbox 状态小指示:每 100ms 拉一次,显示两字符(WiFi 状态 + inbox 状态)。
+    // 没接 WiFi / 没推 inbox 都不会让木鱼不能敲,只是显示状态。
+    if (s_net) {
+        const char *g = muyu_inbox_status_glyph();
+        uint32_t pending = muyu_inbox_pending_count();
+        if (pending > 0) {
+            lv_label_set_text_fmt(s_net, "%s%lu", g, (unsigned long)pending);
+        } else {
+            lv_label_set_text(g);
+        }
+    }
 }
 
 static lv_obj_t *wood_piece(lv_obj_t *parent, int w, int h, int r, uint32_t color)
@@ -146,6 +159,8 @@ static void tap(void)
     if (s_body) { lv_obj_set_y(s_body, BODY_Y + BODY_HIT_DY); s_hold = 1; }
     if (s_mascot) ui_pixel_mascot_jump(s_mascot);
     s_req = 1;
+    // 累计本次敲击到 inbox 后台 task;WiFi 没就绪时只会 pending,等连上再发。
+    muyu_inbox_record_strike(s_merit.total, s_merit.today);
 }
 
 void demo_muyu_enter(void)
@@ -163,6 +178,13 @@ void demo_muyu_enter(void)
     lv_obj_set_style_text_color(s_bat, lv_color_hex(UI_INK), 0);
     lv_obj_set_pos(s_bat, 158, 14);
     lv_label_set_text(s_bat, "--");
+
+    // inbox 状态:电量正下方,小字符,几乎是装饰性的。pending>0 时附带数字。
+    s_net = lv_label_create(s_scr);
+    lv_obj_set_style_text_font(s_net, &lv_font_montserrat_14, 0);
+    lv_obj_set_style_text_color(s_net, lv_color_hex(UI_SKY_DARK), 0);
+    lv_obj_set_pos(s_net, 158, 30);
+    lv_label_set_text(s_net, "-");
 
     lv_obj_t *cap = ui_pixel_label(panel, "MERIT", &lv_font_montserrat_14, UI_SKY_DARK);
     lv_obj_align(cap, LV_ALIGN_TOP_MID, 0, 6);
@@ -201,7 +223,7 @@ void demo_muyu_exit(void)
     if (s_task) { vTaskDelete(s_task); s_task = NULL; }
     if (s_timer) { lv_timer_delete(s_timer); s_timer = NULL; }
     if (s_scr) { lv_obj_delete(s_scr); s_scr = NULL; }
-    s_body = s_total = s_sub = s_bat = s_mascot = NULL;
+    s_body = s_total = s_sub = s_bat = s_mascot = s_net = NULL;
 }
 
 void demo_muyu_key(bsp_btn_t btn, bsp_btn_ev_t ev)
